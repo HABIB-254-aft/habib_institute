@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Students Portal – Habib Institute</title>
+
+    <link rel="stylesheet" href="./CSS/style.css">
+    <script src="./JS/script.js" defer></script>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="header animated-header">
+     <div class="logo">
+    <a href="index.html">
+        <img src="./IMG/my logo.png" alt="Habib Institute Logo" class="site-logo">
+    </a>
+</div>
+
+    <nav class="nav-menu">
+        <ul>
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="about.html">ABOUT US</a></li>
+            <li><a href="services.html">OUR SERVICES</a></li>
+            <li><a href="programs.html">PROGRAMS</a></li>
+            <li><a href="pricing.html">PRICING</a></li>
+            <li><a href="contact.html">CONTACT US</a></li>
+            <li><a href="students.html" class="active-link">STUDENTS PORTAL</a></li>
+        </ul>
+    </nav>
+
+    <div class="menu-icon" id="menu-toggle">☰</div>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">HOME</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="services.html">OUR SERVICES</a>
+    <a href="programs.html">PROGRAMS</a>
+    <a href="pricing.html">PRICING</a>
+    <a href="contact.html">CONTACT US</a>
+    <a href="students.html">STUDENTS PORTAL</a>
+</div>
+
+<!-- PAGE HEADER -->
+<section class="page-header fade-in">
+    <h1>Student Portal</h1>
+    <p>Your gateway to applications, downloads, resources, and updates.</p>
+</section>
+
+<!-- LOGIN PLACEHOLDER -->
+<section class="contact-section fade-in" style="text-align:center;">
+    <h2 style="color:#0d47a1;">Student Login</h2>
+    <p style="max-width:600px; margin:0 auto 25px;">
+        Login functionality will be launched soon. You can still apply, download resources, or subscribe for updates.
+    </p>
+
+    <form class="contact-form" style="max-width:450px; margin:0 auto;">
+        <input type="email" placeholder="Email Address" disabled>
+        <input type="password" placeholder="Password" disabled>
+        <button class="contact-btn" disabled>Login (Coming Soon)</button>
+    </form>
+</section>
+
+<!-- APPLY NOW -->
+<section class="contact-section fade-in" id="apply">
+    <h2 style="color:#0d47a1; text-align:center;">Apply for a Course</h2>
+    <p style="text-align:center; max-width:650px; margin:0 auto 30px;">
+        Fill the form below. Our admissions office will contact you shortly.
+    </p>
+
+    <form action="apply.php" method="post" class="contact-form" style="max-width:600px; margin:0 auto;">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="text" name="phone" placeholder="Phone Number" required>
+
+        <select name="course" required style="padding:12px; border-radius:6px; border:2px solid #c7d4ff;">
+            <option value="">Select a Course</option>
+            <option>English Language Training</option>
+            <option>Somali Language Classes</option>
+            <option>Computer & Digital Literacy</option>
+            <option>Coding Bootcamp</option>
+            <option>Graphic Design</option>
+            <option>IELTS / TOEFL / KSL Prep</option>
+            <option>CV Writing & Coaching</option>
+        </select>
+
+        <textarea name="notes" placeholder="Additional Notes (optional)"></textarea>
+
+        <button class="contact-btn" type="submit">Submit Application</button>
+    </form>
+</section>
+
+<!-- DOWNLOAD RESOURCES -->
+<section class="services-wrapper fade-in">
+    <h2 class="services-title">Student Details</h2>
+
+    <div class="services-container">
+        <div class="service-card">
+            <h3>Download Prospectus</h3>
+            <p>Full details about our programs, fees, timetable, and admission process.</p>
+            <a class="hero-btn" href="prospectus.pdf" download>Download PDF</a>
+        </div>
+
+        <div class="service-card">
+            <h3>Weekly Timetable (PDF)</h3>
+            <p>Updated class schedules for all programs.</p>
+            <a class="hero-btn" href="timetable.pdf" download>Download Timetable</a>
+        </div>
+
+        <div class="service-card">
+            <h3>Course Brochure</h3>
+            <p>A quick overview of our services and programs.</p>
+            <a class="hero-btn" href="brochure.pdf" download>Download Brochure</a>
+        </div>
+
+        <div class="service-card">
+    <h3>Student ID Generator</h3>
+    <p>Create and print an official Habib Institute student ID card.</p>
+    <a href="student-id.html" class="hero-btn">Generate ID</a>
+</div>
+
+<div class="service-card">
+    <h3>Student Login</h3>
+    <p>Access your dashboard</p>
+    <a href="student-login.php" class="hero-btn">Login</a>
+</div>
+
+<div class="service-card">
+    <h3>Student Registration</h3>
+    <p>Create your student account</p>
+    <a href="student-register.php" class="hero-btn">Register</a>
+</div>
+
+    </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="contact-section fade-in">
+    <h2 style="color:#0d47a1; text-align:center;">Stay Updated</h2>
+    <p style="text-align:center;">
+        Subscribe to receive updates on new intakes, promotions, and free learning tips.
+    </p>
+
+    <form action="subscribe.php" method="post" class="contact-form" style="max-width:500px; margin:0 auto;">
+        <input type="email" name="email" placeholder="Enter your email" required>
+        <button class="contact-btn" type="submit">Subscribe</button>
+    </form>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <h3>Habib Institute</h3>
+            <p>Empowering East Africa through language, digital skills, and professional training.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="services.html">Our Services</a></li>
+                <li><a href="programs.html">Programs</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="students.html">Students Portal</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <p>Phone: 0718 413 275</p>
+            <p>Email: info@habibinstitute.com</p>
+            <p>Nairobi, Kenya</p>
+
+            <h4>Follow Us</h4>
+            <a href="https://www.tiktok.com/@habibinstitute254" class="social-link" target="_blank">
+                TikTok: @habibinstitute254
+            </a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2025 Habib Institute. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a class="whatsapp-float"
+   href="https://wa.me/254718413275?text=Hello+Habib+Institute,+I+need+assistance."
+   target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="whatsapp-icon">
+</a>
+
+</body>
+</html>

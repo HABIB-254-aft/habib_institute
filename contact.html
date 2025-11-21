@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us – Habib Institute</title>
+    <link rel="stylesheet" href="./CSS/style.css">
+    <script src="./JS/script.js" defer></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header animated-header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="./IMG/my logo.png" alt="Habib Institute Logo" class="site-logo">
+            </a>
+        </div>
+
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="about.html">ABOUT US</a></li>
+                <li><a href="services.html">OUR SERVICES</a></li>
+                <li><a href="programs.html">PROGRAMS</a></li>
+                <li><a href="pricing.html">PRICING</a></li>
+                <li><a href="contact.html" class="active-link">CONTACT</a></li>
+                <li><a href="students.html">STUDENT PORTAL</a></li>
+            </ul>
+        </nav>
+
+        <div class="menu-icon" id="menu-toggle">☰</div>
+    </header>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">HOME</a>
+        <a href="about.html">ABOUT US</a>
+        <a href="services.html">OUR SERVICES</a>
+        <a href="programs.html">PROGRAMS</a>
+        <a href="pricing.html">PRICING</a>
+        <a href="contact.html">CONTACT</a>
+        <a href="students.html">STUDENT PORTAL</a>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header fade-in">
+        <h1>Contact Us</h1>
+        <p>We're here to help. Reach out for inquiries, enrollment, or support.</p>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section fade-in">
+        <div class="contact-container">
+
+            <!-- CONTACT INFO -->
+            <div class="contact-info">
+                <h3>Contact Information</h3>
+                <p><strong>Phone:</strong> <a href="tel:+254718413275">+254 718 413 275</a></p>
+                <p><strong>Email:</strong> <a href="mailto:info@habibinstitute.com">info@habibinstitute.com</a></p>
+                <p><strong>Location:</strong> Nairobi, Kenya</p>
+                <p><strong>WhatsApp:</strong> <a href="https://wa.me/254718413275" target="_blank">Chat on WhatsApp</a></p>
+
+                <br>
+                <h3>Working Hours</h3>
+                <p>Monday – Saturday</p>
+                <p>8:00 AM – 6:00 PM</p>
+            </div>
+
+            <!-- CONTACT FORM -->
+            <div class="contact-form">
+                <h3>Send Us a Message</h3>
+
+                <form action="contact.php" method="post">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                    <input type="text" name="phone" placeholder="Phone Number" required>
+                    <textarea name="message" placeholder="Your Message" required></textarea>
+
+                    <button type="submit" class="contact-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAP SECTION -->
+    <section class="fade-in" style="padding: 40px 80px;">
+        <h2 style="color:#0d47a1; text-align:center; margin-bottom:20px;">Our Location</h2>
+
+        <div style="max-width:1000px; margin:0 auto; border-radius:8px; overflow:hidden;">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31910.51289444212!2d36.8064934!3d-1.2863894!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1731f3f271ab%3A0xa84f3b4db4f383b3!2sNairobi!5e0!3m2!1sen!2ske!4v1701050424792!5m2!1sen!2ske"
+                width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy">
+            </iframe>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-banner fade-in">
+        <h2>Need Immediate Support?</h2>
+        <p>Reach out on WhatsApp and our support team will assist you instantly.</p>
+        <a href="https://wa.me/254718413275" class="cta-btn">Chat on WhatsApp</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-col">
+                <h3>Habib Institute</h3>
+                <p>Empowering learners through languages, technology and career development.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="programs.html">Programs</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="students.html">Student Portal</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <p><a href="tel:+254718413275" class="social-link">+254 718 413 275</a></p>
+                <p><a href="mailto:info@habibinstitute.com" class="social-link">info@habibinstitute.com</a></p>
+                <p>Nairobi, Kenya</p>
+                <h4>Socials</h4>
+                <a href="https://www.tiktok.com/@habibinstitute254" target="_blank" class="social-link">
+                    TikTok
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2025 Habib Institute of Languages & Technology. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOAT -->
+    <a class="whatsapp-float"
+       href="https://wa.me/254718413275?text=Hello+Habib+Institute,+I+need+assistance."
+       target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+             class="whatsapp-icon">
+    </a>
+
+</body>
+</html>

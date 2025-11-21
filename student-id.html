@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student ID Generator – Habib Institute</title>
+
+    <link rel="stylesheet" href="./CSS/style.css">
+    <script src="./JS/script.js" defer></script>
+
+    <style>
+        /* ---------- Student ID Generator Specific Styles ---------- */
+
+        .idgen-wrapper {
+            padding: 40px 80px;
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .idgen-form {
+            flex: 1;
+            min-width: 260px;
+            max-width: 420px;
+            background: #f4f7ff;
+            padding: 22px;
+            border-radius: 10px;
+            border-left: 5px solid #0d47a1;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .idgen-form h2 {
+            color: #0d47a1;
+            margin-bottom: 12px;
+        }
+
+        .idgen-form p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 14px;
+        }
+
+        .idgen-form label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #0d47a1;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .idgen-form input,
+        .idgen-form select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #c7d4ff;
+            font-size: 14px;
+        }
+
+        .idgen-form input[type="file"] {
+            padding: 6px;
+        }
+
+        .idgen-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .idgen-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .idgen-btn-primary {
+            background: #0d47a1;
+            color: #fff;
+        }
+
+        .idgen-btn-primary:hover {
+            background: #06306d;
+        }
+
+        .idgen-btn-secondary {
+            background: #ffffff;
+            color: #0d47a1;
+            border: 2px solid #0d47a1;
+        }
+
+        .idgen-btn-secondary:hover {
+            background: #0d47a1;
+            color: #ffffff;
+        }
+
+        /* ---------- ID Card Preview ---------- */
+
+        .idgen-preview-area {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .id-card {
+            width: 340px;
+            height: 210px;
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            background:
+                radial-gradient(circle at 10% 20%, rgba(13,71,161,0.9), rgba(6,48,109,0.95)),
+                repeating-linear-gradient(
+                    135deg,
+                    rgba(255,255,255,0.12) 0px,
+                    rgba(255,255,255,0.08) 2px,
+                    transparent 2px,
+                    transparent 4px
+                );
+        }
+
+        /* Hologram overlay */
+        .id-holo {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 10% 0%, rgba(255,255,255,0.22), transparent 60%),
+                        radial-gradient(circle at 90% 100%, rgba(255,255,255,0.12), transparent 60%);
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        .id-top {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            padding: 10px 14px 0 14px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .id-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .id-logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #ffffff;
+        }
+
+        .id-logo-text {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .id-logo-text span {
+            display: block;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .id-badge-tag {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .id-main {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            padding: 8px 14px 6px 14px;
+            gap: 12px;
+        }
+
+        .id-photo-wrapper {
+            width: 72px;
+            height: 90px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .id-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .id-photo-placeholder {
+            font-size: 10px;
+            text-align: center;
+            padding: 4px;
+            opacity: 0.8;
+        }
+
+        .id-details {
+            flex: 1;
+            font-size: 11px;
+        }
+
+        .id-details-row {
+            margin-bottom: 4px;
+        }
+
+        .id-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            opacity: 0.85;
+        }
+
+        .id-value {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .id-dates {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .id-footer {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 0 14px 8px 14px;
+        }
+
+        .id-signature {
+            font-size: 8px;
+            text-align: center;
+        }
+
+        .id-signature-line {
+            width: 90px;
+            border-bottom: 1px solid rgba(255,255,255,0.8);
+            margin: 0 auto 2px auto;
+        }
+
+        .id-barcode {
+            width: 100px;
+            height: 26px;
+            display: flex;
+            gap: 1px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .id-bar {
+            width: 2px;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+        }
+
+        .id-bar.thin {
+            transform: scaleX(0.6);
+            opacity: 0.7;
+        }
+
+        .id-qr {
+            width: 42px;
+            height: 42px;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    #ffffff 0px,
+                    #ffffff 3px,
+                    #000000 3px,
+                    #000000 4px
+                );
+            mix-blend-mode: screen;
+            border-radius: 4px;
+        }
+
+        /* Print handling: only print the card */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .id-card, .id-card * {
+                visibility: visible;
+            }
+            .id-card {
+                position: absolute;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                box-shadow: none;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .idgen-wrapper {
+                padding: 30px 20px;
+                flex-direction: column;
+            }
+            .id-card {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header animated-header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="./IMG/my logo.png" alt="Habib Institute Logo" class="site-logo">
+            </a>
+        </div>
+
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="about.html">ABOUT US</a></li>
+                <li><a href="services.html">OUR SERVICES</a></li>
+                <li><a href="programs.html">PROGRAMS</a></li>
+                <li><a href="pricing.html">PRICING</a></li>
+                <li><a href="contact.html">CONTACT</a></li>
+                <li><a href="students.html">STUDENT PORTAL</a></li>
+            </ul>
+        </nav>
+
+        <div class="menu-icon" id="menu-toggle">☰</div>
+    </header>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">HOME</a>
+        <a href="about.html">ABOUT US</a>
+        <a href="services.html">OUR SERVICES</a>
+        <a href="programs.html">PROGRAMS</a>
+        <a href="pricing.html">PRICING</a>
+        <a href="contact.html">CONTACT</a>
+        <a href="students.html">STUDENT PORTAL</a>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header fade-in">
+        <h1>Student ID Generator</h1>
+        <p>Create a professional digital student ID card for Habib Institute learners.</p>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <section class="idgen-wrapper fade-in">
+
+        <!-- FORM -->
+        <div class="idgen-form">
+            <h2>Enter Student Details</h2>
+            <p>Fill in the details below, then click “Generate ID”. You can print or save it to the system.</p>
+
+            <label for="id-name">Full Name</label>
+            <input type="text" id="id-name" placeholder="e.g. Mohamed Ali Hassan" required>
+
+            <label for="id-course">Course</label>
+            <select id="id-course">
+                <option value="">Select course</option>
+                <option>English Language Training</option>
+                <option>Somali Language Classes</option>
+                <option>Computer & Digital Literacy</option>
+                <option>Coding Bootcamp</option>
+                <option>Graphic Design</option>
+                <option>IELTS / TOEFL / KSL Prep</option>
+                <option>CV Writing & Job Coaching</option>
+            </select>
+
+            <label for="id-number">Student ID (optional)</label>
+            <input type="text" id="id-number" placeholder="Leave empty to auto-generate">
+
+            <label for="id-phone">Phone (optional)</label>
+            <input type="text" id="id-phone" placeholder="e.g. +2547...">
+
+            <label for="id-photo-input">Photo (optional)</label>
+            <input type="file" id="id-photo-input" accept="image/*">
+
+            <label for="id-issue-date">Issue Date</label>
+            <input type="date" id="id-issue-date">
+
+            <label for="id-expiry-date">Expiry Date</label>
+            <input type="date" id="id-expiry-date">
+
+            <div class="idgen-actions">
+                <button type="button" class="idgen-btn idgen-btn-primary" id="id-generate-btn">
+                    Generate ID
+                </button>
+                <button type="button" class="idgen-btn idgen-btn-secondary" id="id-save-btn">
+                    Save ID to System
+                </button>
+                <button type="button" class="idgen-btn idgen-btn-secondary" id="id-print-btn">
+                    Print / Save
+                </button>
+            </div>
+
+            <!-- Hidden form to send data to PHP -->
+            <form id="id-save-form" action="save_id.php" method="post" style="display:none;">
+                <input type="hidden" name="name" id="save-name">
+                <input type="hidden" name="course" id="save-course">
+                <input type="hidden" name="student_id" id="save-id">
+                <input type="hidden" name="phone" id="save-phone">
+                <input type="hidden" name="issue" id="save-issue">
+                <input type="hidden" name="expiry" id="save-expiry">
+            </form>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="idgen-preview-area">
+            <div class="id-card" id="id-card">
+                <div class="id-holo"></div>
+
+                <div class="id-top">
+                    <div class="id-logo">
+                        <img src="./IMG/my logo.png" alt="Logo">
+                        <div class="id-logo-text">
+                            HABIB INSTITUTE
+                            <span>Student ID Card</span>
+                        </div>
+                    </div>
+                    <div class="id-badge-tag">OFFICIAL</div>
+                </div>
+
+                <div class="id-main">
+                    <div class="id-photo-wrapper">
+                        <img src="" alt="Student Photo" id="id-photo" class="id-photo" style="display:none;">
+                        <div class="id-photo-placeholder" id="id-photo-placeholder">
+                            PHOTO
+                            <br>
+                            1x1
+                        </div>
+                    </div>
+
+                    <div class="id-details">
+                        <div class="id-details-row">
+                            <div class="id-label">Name</div>
+                            <div class="id-value" id="id-card-name">Student Name</div>
+                        </div>
+
+                        <div class="id-details-row">
+                            <div class="id-label">Student ID</div>
+                            <div class="id-value" id="id-card-number">HAB-00000</div>
+                        </div>
+
+                        <div class="id-details-row">
+                            <div class="id-label">Course</div>
+                            <div class="id-value" id="id-card-course">Course Name</div>
+                        </div>
+
+                        <div class="id-details-row">
+                            <div class="id-label">Phone</div>
+                            <div class="id-value" id="id-card-phone">+2547...</div>
+                        </div>
+
+                        <div class="id-dates">
+                            <div>
+                                <div class="id-label">Issued</div>
+                                <div class="id-value" id="id-card-issue">YYYY-MM-DD</div>
+                            </div>
+                            <div>
+                                <div class="id-label">Expires</div>
+                                <div class="id-value" id="id-card-expiry">YYYY-MM-DD</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="id-footer">
+                    <div class="id-signature">
+                        <div class="id-signature-line"></div>
+                        Director / Registrar
+                    </div>
+
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <div class="id-barcode">
+                            <div class="id-bar"></div>
+                            <div class="id-bar thin"></div>
+                            <div class="id-bar"></div>
+                            <div class="id-bar thin"></div>
+                            <div class="id-bar"></div>
+                            <div class="id-bar thin"></div>
+                            <div class="id-bar"></div>
+                        </div>
+                        <div class="id-qr"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Habib Institute</h3>
+                <p>Empowering learners through languages, technology, and professional development.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="programs.html">Programs</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="students.html">Student Portal</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <p>Phone: <a href="tel:+254718413275" class="social-link">+254 718 413 275</a></p>
+                <p>Email: <a href="mailto:info@habibinstitute.com" class="social-link">info@habibinstitute.com</a></p>
+                <p>Nairobi, Kenya</p>
+                <h4>Socials</h4>
+                <a href="https://www.tiktok.com/@habibinstitute254" target="_blank" class="social-link">TikTok</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2025 Habib Institute of Languages & Technology. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOAT -->
+    <a class="whatsapp-float"
+       href="https://wa.me/254718413275?text=Hello+Habib+Institute,+I+need+assistance."
+       target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+             class="whatsapp-icon">
+    </a>
+
+    <!-- ID GENERATOR LOGIC -->
+    <script>
+        const nameInput = document.getElementById('id-name');
+        const courseInput = document.getElementById('id-course');
+        const numberInput = document.getElementById('id-number');
+        const phoneInput = document.getElementById('id-phone');
+        const photoInput = document.getElementById('id-photo-input');
+        const issueInput = document.getElementById('id-issue-date');
+        const expiryInput = document.getElementById('id-expiry-date');
+
+        const cardName = document.getElementById('id-card-name');
+        const cardNumber = document.getElementById('id-card-number');
+        const cardCourse = document.getElementById('id-card-course');
+        const cardPhone = document.getElementById('id-card-phone');
+        const cardIssue = document.getElementById('id-card-issue');
+        const cardExpiry = document.getElementById('id-card-expiry');
+
+        const photoImg = document.getElementById('id-photo');
+        const photoPlaceholder = document.getElementById('id-photo-placeholder');
+
+        const generateBtn = document.getElementById('id-generate-btn');
+        const printBtn = document.getElementById('id-print-btn');
+        const saveBtn = document.getElementById('id-save-btn');
+
+        const saveForm = document.getElementById('id-save-form');
+        const saveName = document.getElementById('save-name');
+        const saveCourse = document.getElementById('save-course');
+        const saveId = document.getElementById('save-id');
+        const savePhone = document.getElementById('save-phone');
+        const saveIssue = document.getElementById('save-issue');
+        const saveExpiry = document.getElementById('save-expiry');
+
+        // Set default dates
+        window.addEventListener('load', () => {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
+            issueInput.value = todayStr;
+
+            const nextYear = `${yyyy + 1}-${mm}-${dd}`;
+            expiryInput.value = nextYear;
+
+            cardIssue.textContent = todayStr;
+            cardExpiry.textContent = nextYear;
+        });
+
+        // Photo preview
+        photoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoImg.src = e.target.result;
+                photoImg.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Generate ID & update card
+        function generateIdCard() {
+            const nameVal = nameInput.value.trim();
+            const courseVal = courseInput.value.trim();
+            let idVal = numberInput.value.trim();
+            const phoneVal = phoneInput.value.trim();
+            const issueVal = issueInput.value || cardIssue.textContent;
+            const expiryVal = expiryInput.value || cardExpiry.textContent;
+
+            if (!nameVal) {
+                alert("Please enter the student name.");
+                return false;
+            }
+
+            if (!idVal) {
+                const now = new Date();
+                const yr = now.getFullYear();
+                const rand = Math.floor(1000 + Math.random() * 9000);
+                idVal = `HAB-${yr}-${rand}`;
+                numberInput.value = idVal;
+            }
+
+            cardName.textContent = nameVal;
+            cardNumber.textContent = idVal;
+            cardCourse.textContent = courseVal || "N/A";
+            cardPhone.textContent = phoneVal || "N/A";
+            cardIssue.textContent = issueVal;
+            cardExpiry.textContent = expiryVal;
+
+            return true;
+        }
+
+        generateBtn.addEventListener('click', () => {
+            generateIdCard();
+        });
+
+        // Save ID to server
+        saveBtn.addEventListener('click', () => {
+            const ok = generateIdCard();
+            if (!ok) return;
+
+            const nameVal = nameInput.value.trim();
+            const courseVal = courseInput.value.trim();
+            const idVal = numberInput.value.trim();
+            const phoneVal = phoneInput.value.trim();
+            const issueVal = issueInput.value || cardIssue.textContent;
+            const expiryVal = expiryInput.value || cardExpiry.textContent;
+
+            saveName.value = nameVal;
+            saveCourse.value = courseVal;
+            saveId.value = idVal;
+            savePhone.value = phoneVal;
+            saveIssue.value = issueVal;
+            saveExpiry.value = expiryVal;
+
+            saveForm.submit();
+        });
+
+        // Print
+        printBtn.addEventListener('click', () => {
+            window.print();
+        });
+    </script>
+
+</body>
+</html>

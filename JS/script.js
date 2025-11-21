@@ -60,6 +60,18 @@ window.addEventListener("scroll", () => {
     }
     lastScrollY = window.scrollY;
 });
+/* 
+   FAQs
+ */
+document.addEventListener("DOMContentLoaded", function () {
+    const faqItems = document.querySelectorAll(".faq-item");
+
+    faqItems.forEach(item => {
+        item.querySelector(".faq-question").addEventListener("click", () => {
+            item.classList.toggle("active");
+        });
+    });
+});
 
 /* =======================
    SMOOTH SCROLL FOR ANCHOR LINKS

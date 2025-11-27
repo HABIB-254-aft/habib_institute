@@ -66,11 +66,24 @@ window.addEventListener("scroll", () => {
 document.addEventListener("DOMContentLoaded", function () {
     const faqItems = document.querySelectorAll(".faq-item");
 
-    faqItems.forEach(item => {
-        item.querySelector(".faq-question").addEventListener("click", () => {
-            item.classList.toggle("active");
+    faqItems.forEach((item) => {
+        item.addEventListener("click", () => {
+            let ans = item.querySelector(".faq-answer");
+            if (ans.style.display == "none") {
+                ans.style.display = "block";
+            } else {
+                ans.style.display = "none";
+            }
+
         });
-    });
+    })
+    // faqItems.forEach(item => {
+
+    //     item.querySelector(".faq-question").addEventListener("click", () => {
+
+    //         item.classList.toggle("active");
+    //     });
+    // });
 });
 
 /* =======================

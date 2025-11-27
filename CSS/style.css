@@ -1,9 +1,5 @@
 /* GLOBAL */
 
-html {
-    scroll-behavior: smooth;
-}
-
 .fade-in {
     opacity: 0;
     transform: translateY(20px);

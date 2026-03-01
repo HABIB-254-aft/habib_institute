@@ -11,27 +11,17 @@ if ($email === '') {
     exit;
 }
 
-// Paths
-$storageDir = __DIR__ . "/storage";
-if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
+require_once __DIR__ . '/config/database.php';
 
-$studentsFile = $storageDir . "/students.txt";
-$resetsFile   = $storageDir . "/password_resets.txt";
-
-// Check if email exists in students file
+// Check if email exists in database
 $emailExists = false;
-if (file_exists($studentsFile)) {
-    $lines = file($studentsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $parts = explode("|", $line);
-        if (count($parts) >= 3) {
-            $semail = $parts[2];
-            if (strcasecmp(trim($semail), $email) === 0) {
-                $emailExists = true;
-                break;
-            }
-        }
-    }
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ?");
+    $stmt->execute([$email]);
+    $emailExists = $stmt->fetch() !== false;
+} catch (PDOException $e) {
+    error_log("Password reset check error: " . $e->getMessage());
 }
 
 // For security: even if email not found, we behave the same externally
@@ -40,9 +30,14 @@ if ($emailExists) {
     $token   = bin2hex(random_bytes(16));
     $expires = time() + 3600; // 1 hour from now
 
-    // Save token | email | expiryTimestamp
-    $line = $token . "|" . $email . "|" . $expires . "\n";
-    file_put_contents($resetsFile, $line, FILE_APPEND);
+    // Save token to database
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("INSERT INTO password_resets (token, email, expires_at, created_at) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$token, $email, $expires, date("Y-m-d H:i:s")]);
+    } catch (PDOException $e) {
+        error_log("Password reset save error: " . $e->getMessage());
+    }
 
     // Build reset link
     $resetLink = "https://" . $_SERVER['HTTP_HOST'] . "/reset-password.php?token=" . urlencode($token);

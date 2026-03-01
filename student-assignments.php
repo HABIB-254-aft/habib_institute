@@ -8,33 +8,25 @@ if (!isset($_SESSION['student_logged_in'])) {
 
 $studentCourse = $_SESSION['student_course'];
 
-// Map course to its assignment file
-$courseFiles = [
-    "English Language Training" => "english.txt",
-    "Somali Language Classes" => "somali.txt",
-    "Computer & Digital Literacy" => "digital.txt",
-    "Coding Bootcamp" => "coding.txt",
-    "Graphic Design" => "design.txt",
-    "IELTS / TOEFL / KSL Prep" => "ielts.txt",
-    "CV Writing & Job Coaching" => "cv.txt",
-];
+require_once __DIR__ . '/config/database.php';
 
-$storageDir      = __DIR__ . "/storage/assignments";
-$assignmentFile  = $storageDir . "/" . ($courseFiles[$studentCourse] ?? "");
-$assignments     = [];
-
-if (file_exists($assignmentFile)) {
-    $lines = file($assignmentFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-    foreach ($lines as $line) {
-        list($title, $desc, $file, $deadline) = explode("|", $line);
+$assignments = [];
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT title, description, file_path, deadline FROM assignments WHERE course = ?");
+    $stmt->execute([$studentCourse]);
+    $results = $stmt->fetchAll();
+    
+    foreach ($results as $row) {
         $assignments[] = [
-            "title" => $title,
-            "desc" => $desc,
-            "file" => $file,
-            "deadline" => $deadline
+            "title" => $row['title'],
+            "desc" => $row['description'],
+            "file" => $row['file_path'],
+            "deadline" => $row['deadline']
         ];
     }
+} catch (PDOException $e) {
+    error_log("Assignments load error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -42,6 +34,8 @@ if (file_exists($assignmentFile)) {
 <head>
     <meta charset="UTF-8">
     <title>My Assignments – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

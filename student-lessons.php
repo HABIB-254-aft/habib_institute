@@ -23,21 +23,20 @@ $lessonsMap = [
 
 $totalLessons = $lessonsMap[$studentCourse] ?? 0;
 
-// Load existing progress
-$progressDir  = __DIR__ . "/storage/progress";
-if (!is_dir($progressDir)) mkdir($progressDir, 0755, true);
+// Load existing progress from database
+require_once __DIR__ . '/config/database.php';
 
-$progressFile = $progressDir . "/{$studentId}.txt";
 $progressData = [];
-
-if (file_exists($progressFile)) {
-    $lines = file($progressFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, "=") !== false) {
-            list($key, $val) = explode("=", $line, 2);
-            $progressData[$key] = $val;
-        }
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT lesson_key, status FROM student_progress WHERE student_id = ?");
+    $stmt->execute([$studentId]);
+    $progress = $stmt->fetchAll();
+    foreach ($progress as $row) {
+        $progressData[$row['lesson_key']] = $row['status'];
     }
+} catch (PDOException $e) {
+    error_log("Progress load error: " . $e->getMessage());
 }
 $status = $_GET['status'] ?? '';
 ?>
@@ -46,6 +45,8 @@ $status = $_GET['status'] ?? '';
 <head>
     <meta charset="UTF-8">
     <title>My Lessons – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

@@ -21,34 +21,18 @@ if (!empty($errors)) {
     $errorMsg = implode(" ", $errors);
 }
 
-// ensure storage folder exists
-$storageDir = __DIR__ . "/storage";
-if (!is_dir($storageDir)) {
-    mkdir($storageDir, 0755, true);
-}
-
-$filePath = $storageDir . "/student_ids.txt";
-
-// sanitize to avoid breaking format
-$sanitize = function($value) {
-    return str_replace("|", "/", $value);
-};
-
-$name      = $sanitize($name);
-$course    = $sanitize($course);
-$studentId = $sanitize($studentId);
-$phone     = $sanitize($phone);
-$issue     = $sanitize($issue);
-$expiry    = $sanitize($expiry);
+require_once __DIR__ . '/config/database.php';
 
 if (empty($errors)) {
-    $timestamp = date("Y-m-d H:i:s");
-
-    // Format: ID|Name|Course|Phone|Issue|Expiry|Timestamp
-    $line = $studentId . "|" . $name . "|" . $course . "|" . $phone . "|" . $issue . "|" . $expiry . "|" . $timestamp . "\n";
-
-    file_put_contents($filePath, $line, FILE_APPEND);
-    $saved = true;
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("INSERT INTO student_ids (student_id, name, course, phone, issue_date, expiry_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$studentId, $name, $course, $phone, $issue, $expiry, date("Y-m-d H:i:s")]);
+        $saved = true;
+    } catch (PDOException $e) {
+        $saved = false;
+        error_log("Student ID save error: " . $e->getMessage());
+    }
 } else {
     $saved = false;
 }
@@ -58,6 +42,8 @@ if (empty($errors)) {
 <head>
     <meta charset="UTF-8">
     <title>Student ID Saved – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

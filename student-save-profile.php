@@ -17,35 +17,26 @@ if ($name === '' || $email === '' || $course === '') {
     die("All required fields must be filled.");
 }
 
-$storageDir = __DIR__ . "/storage";
-$studentsFile = $storageDir . "/students.txt";
+require_once __DIR__ . '/config/database.php';
 
-// Modify students.txt
-if (file_exists($studentsFile)) {
-    $lines = file($studentsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $newLines = [];
-
-    foreach ($lines as $line) {
-        list($id, $sname, $semail, $sphone, $scourse, $hash, $createdAt) = explode("|", $line);
-
-        if ($id === $studentId) {
-            // Update details
-            $updatedHash = $hash;
-            if ($newPass !== "") {
-                $updatedHash = password_hash($newPass, PASSWORD_BCRYPT);
-            }
-
-            $line = $id . "|" . $name . "|" . $email . "|" . $phone . "|" . $course . "|" . $updatedHash . "|" . $createdAt;
-
-            // Update session variables
-            $_SESSION['student_name'] = $name;
-            $_SESSION['student_course'] = $course;
-        }
-
-        $newLines[] = $line;
+try {
+    $pdo = getDB();
+    
+    // Update student details
+    if ($newPass !== "") {
+        $hash = password_hash($newPass, PASSWORD_BCRYPT);
+        $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, phone = ?, course = ?, password_hash = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $phone, $course, $hash, $studentId]);
+    } else {
+        $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, phone = ?, course = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $phone, $course, $studentId]);
     }
-
-    file_put_contents($studentsFile, implode("\n", $newLines) . "\n");
+    
+    // Update session variables
+    $_SESSION['student_name'] = $name;
+    $_SESSION['student_course'] = $course;
+} catch (PDOException $e) {
+    die("Error updating profile: " . $e->getMessage());
 }
 
 header("Location: student-edit-profile.php?updated=1");

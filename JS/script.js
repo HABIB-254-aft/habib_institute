@@ -101,3 +101,49 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
         }
     });
 });
+
+/* =======================
+   DARK/LIGHT MODE TOGGLE
+========================== */
+
+(function() {
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = document.getElementById("theme-icon");
+    const themeText = document.getElementById("theme-text");
+    const html = document.documentElement;
+
+    // Get saved theme or default to light
+    const currentTheme = localStorage.getItem("theme") || "light";
+    
+    // Apply saved theme on page load
+    if (currentTheme === "dark") {
+        html.setAttribute("data-theme", "dark");
+        themeIcon.textContent = "☀️";
+        themeText.textContent = "Light";
+    } else {
+        html.removeAttribute("data-theme");
+        themeIcon.textContent = "🌙";
+        themeText.textContent = "Dark";
+    }
+
+    // Toggle theme on button click
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            const isDark = html.getAttribute("data-theme") === "dark";
+            
+            if (isDark) {
+                // Switch to light mode
+                html.removeAttribute("data-theme");
+                themeIcon.textContent = "🌙";
+                themeText.textContent = "Dark";
+                localStorage.setItem("theme", "light");
+            } else {
+                // Switch to dark mode
+                html.setAttribute("data-theme", "dark");
+                themeIcon.textContent = "☀️";
+                themeText.textContent = "Light";
+                localStorage.setItem("theme", "dark");
+            }
+        });
+    }
+})();

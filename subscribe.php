@@ -27,12 +27,16 @@ if (!empty($errors)) {
     $errorMsg = implode(" ", $errors);
 }
 
-// ---- SAVE SUBSCRIBER TO FILE ----
-$savePath = __DIR__ . "/storage/subscribers.txt";
+// ---- SAVE SUBSCRIBER TO DATABASE ----
+require_once __DIR__ . '/config/database.php';
 
-$entry = "Email: $email | Date: " . date("Y-m-d H:i:s") . "\n";
-
-file_put_contents($savePath, $entry, FILE_APPEND);
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("INSERT INTO subscribers (email, created_at) VALUES (?, ?) ON DUPLICATE KEY UPDATE created_at = created_at");
+    $stmt->execute([$email, date("Y-m-d H:i:s")]);
+} catch (PDOException $e) {
+    error_log("Subscriber save error: " . $e->getMessage());
+}
 
 // 3. Destination email
 $to = "info@habibinstitute.com";

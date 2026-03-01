@@ -7,31 +7,31 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] === fal
     exit;
 }
 
-// File location
-$subFile = __DIR__ . "/../storage/subscribers.txt";
+require_once __DIR__ . '/../config/database.php';
 
-// Load data
-if (!file_exists($subFile)) {
-    $subscribers = "No subscribers found.";
-} else {
-    $subscribers = file_get_contents($subFile);
+$subscribers = [];
+try {
+    $pdo = getDB();
+    
+    // DELETE ALL HANDLER
+    if (isset($_POST['delete_all'])) {
+        $pdo->exec("DELETE FROM subscribers");
+    }
+    
+    $stmt = $pdo->query("SELECT * FROM subscribers ORDER BY created_at DESC");
+    $subscribers = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Subscribers view error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <form method="post" onsubmit="return confirm('Delete ALL subscribers?');">
-    <input type="hidden" name="delete_all" value="1">
-    <button class="back-btn" style="background:red; margin-bottom:15px;">🗑 Delete All Subscribers</button>
-</form>
-
-if (isset($_POST['delete_all'])) {
-    file_put_contents($subFile, "");
-    $subscribers = "";
-}
 
     <meta charset="UTF-8">
     <title>View Subscribers – Admin Panel</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
 
     <style>
@@ -77,12 +77,20 @@ if (isset($_POST['delete_all'])) {
 </section>
 
 <section class="admin-container fade-in">
+    <!-- DELETE ALL SUBSCRIBERS -->
+    <form method="post" onsubmit="return confirm('Delete ALL subscribers?');">
+        <input type="hidden" name="delete_all" value="1">
+        <button class="back-btn" style="background:red; margin-bottom:15px;">🗑 Delete All Subscribers</button>
+    </form>
+
     <div class="admin-box">
         <?php 
-            if (trim($subscribers) === "") {
+            if (empty($subscribers)) {
                 echo "No subscribers available.";
             } else {
-                echo htmlspecialchars($subscribers);
+                foreach ($subscribers as $sub) {
+                    echo "Email: " . htmlspecialchars($sub['email']) . " | Date: " . htmlspecialchars($sub['created_at']) . "\n";
+                }
             }
         ?>
     </div>

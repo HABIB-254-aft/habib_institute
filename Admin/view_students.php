@@ -7,27 +7,15 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-$studentsFile = __DIR__ . "/../storage/students.txt";
+require_once __DIR__ . '/../config/database.php';
+
 $students = [];
-
-if (file_exists($studentsFile)) {
-    $lines = file($studentsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-    // Newest first
-    $lines = array_reverse($lines);
-
-    foreach ($lines as $line) {
-        list($id, $name, $email, $phone, $course, $hash, $created) = explode("|", $line);
-
-        $students[] = [
-            "id"      => $id,
-            "name"    => $name,
-            "email"   => $email,
-            "phone"   => $phone,
-            "course"  => $course,
-            "created" => $created
-        ];
-    }
+try {
+    $pdo = getDB();
+    $stmt = $pdo->query("SELECT id, name, email, phone, course, created_at FROM students ORDER BY created_at DESC");
+    $students = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Students view error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -35,6 +23,8 @@ if (file_exists($studentsFile)) {
 <head>
     <meta charset="UTF-8">
     <title>View Students – Admin Panel</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
 
     <style>

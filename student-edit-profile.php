@@ -39,6 +39,8 @@ if (file_exists($studentsFile)) {
 <head>
     <meta charset="UTF-8">
     <title>Edit Profile – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

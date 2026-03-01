@@ -1,8 +1,6 @@
 <?php
 session_start();
-
-$storageDir = __DIR__ . "/storage";
-$filePath = $storageDir . "/students.txt";
+require_once __DIR__ . '/config/database.php';
 
 $error = "";
 
@@ -10,29 +8,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email    = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (file_exists($filePath)) {
-        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-        foreach ($lines as $line) {
-            list($id, $name, $semail, $sphone, $scourse, $hash, $createdAt) = explode("|", $line);
-
-            if (strcasecmp($email, $semail) === 0) {
-                if (password_verify($password, $hash)) {
-                    $_SESSION['student_logged_in'] = true;
-                    $_SESSION['student_id'] = $id;
-                    $_SESSION['student_name'] = $name;
-                    $_SESSION['student_course'] = $scourse;
-                    header("Location: student-dashboard.php");
-                    exit;
-                } else {
-                    $error = "Incorrect password.";
-                }
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT id, name, email, phone, course, password_hash FROM students WHERE email = ?");
+        $stmt->execute([$email]);
+        $student = $stmt->fetch();
+        
+        if ($student) {
+            if (password_verify($password, $student['password_hash'])) {
+                $_SESSION['student_logged_in'] = true;
+                $_SESSION['student_id'] = $student['id'];
+                $_SESSION['student_name'] = $student['name'];
+                $_SESSION['student_course'] = $student['course'];
+                header("Location: student-dashboard.php");
+                exit;
+            } else {
+                $error = "Incorrect password.";
             }
+        } else {
+            $error = "Email not found.";
         }
-
-        if ($error === "") $error = "Email not found.";
-    } else {
-        $error = "No student accounts found.";
+    } catch (PDOException $e) {
+        $error = "Login failed. Please try again.";
+        error_log("Login error: " . $e->getMessage());
     }
 }
 ?>
@@ -41,6 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Student Login – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

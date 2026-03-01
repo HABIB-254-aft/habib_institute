@@ -24,19 +24,19 @@ $lessonsMap = [
 $totalLessons = $lessonsMap[$course] ?? 0;
 $completedLessons = 0;
 
-// Load progress file
-$progressDir = __DIR__ . "/storage/progress";
-$progressFile = $progressDir . "/{$id}.txt";
+// Load progress from database
+require_once __DIR__ . '/config/database.php';
 
-if ($totalLessons > 0 && file_exists($progressFile)) {
-    $lines = file($progressFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, "=") !== false) {
-            list($key, $val) = explode("=", $line, 2);
-            if (strpos($key, "lesson_") === 0 && trim($val) === "done") {
-                $completedLessons++;
-            }
-        }
+if ($totalLessons > 0) {
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT lesson_key, status FROM student_progress WHERE student_id = ? AND status = 'done'");
+        $stmt->execute([$id]);
+        $progress = $stmt->fetchAll();
+        $completedLessons = count($progress);
+    } catch (PDOException $e) {
+        error_log("Progress load error: " . $e->getMessage());
+        $completedLessons = 0;
     }
 }
 
@@ -49,6 +49,8 @@ $progressPercent = ($totalLessons > 0)
 <head>
     <meta charset="UTF-8">
     <title>Student Dashboard – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
     <style>
         .progress-bar-wrapper {

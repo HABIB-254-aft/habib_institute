@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-$storageDir = __DIR__ . "/../storage/classes";
+$storageDir = __DIR__ . "/../Storage/classes";
 if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
 
 $status = $_GET['status'] ?? '';
@@ -17,6 +17,8 @@ $status = $_GET['status'] ?? '';
 <head>
     <meta charset="UTF-8">
     <title>Manage Online Classes – Admin</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
 
     <style>

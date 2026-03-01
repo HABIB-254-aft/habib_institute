@@ -12,6 +12,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard – Habib Institute</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
 </head>
 

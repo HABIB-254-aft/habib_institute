@@ -7,17 +7,15 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-$filePath = __DIR__ . "/../storage/student_ids.txt";
-$rows = [];
+require_once __DIR__ . '/../config/database.php';
 
-if (file_exists($filePath)) {
-    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $parts = explode("|", $line);
-        if (count($parts) >= 7) {
-            $rows[] = $parts; // [ID, Name, Course, Phone, Issue, Expiry, SavedAt]
-        }
-    }
+$rows = [];
+try {
+    $pdo = getDB();
+    $stmt = $pdo->query("SELECT student_id, name, course, phone, issue_date, expiry_date, created_at FROM student_ids ORDER BY created_at DESC");
+    $rows = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Student IDs view error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -25,6 +23,8 @@ if (file_exists($filePath)) {
 <head>
     <meta charset="UTF-8">
     <title>View Student IDs – Admin Panel</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
     <style>
         .admin-container {
@@ -85,15 +85,15 @@ if (file_exists($filePath)) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($rows as $columns): ?>
+                <?php foreach ($rows as $row): ?>
                     <tr>
-                        <td><?= htmlspecialchars($columns[0]) ?></td>
-                        <td><?= htmlspecialchars($columns[1]) ?></td>
-                        <td><?= htmlspecialchars($columns[2]) ?></td>
-                        <td><?= htmlspecialchars($columns[3]) ?></td>
-                        <td><?= htmlspecialchars($columns[4]) ?></td>
-                        <td><?= htmlspecialchars($columns[5]) ?></td>
-                        <td><?= htmlspecialchars($columns[6]) ?></td>
+                        <td><?= htmlspecialchars($row['student_id']) ?></td>
+                        <td><?= htmlspecialchars($row['name']) ?></td>
+                        <td><?= htmlspecialchars($row['course']) ?></td>
+                        <td><?= htmlspecialchars($row['phone']) ?></td>
+                        <td><?= htmlspecialchars($row['issue_date']) ?></td>
+                        <td><?= htmlspecialchars($row['expiry_date']) ?></td>
+                        <td><?= htmlspecialchars($row['created_at']) ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

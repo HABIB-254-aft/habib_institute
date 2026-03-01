@@ -17,7 +17,7 @@ if ($assignment === '') {
     exit;
 }
 
-$storageDir = __DIR__ . "/storage/homework/" . $studentId;
+$storageDir = __DIR__ . "/Storage/homework/" . $studentId;
 
 // Create student folder if missing
 if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
@@ -48,11 +48,16 @@ if (!move_uploaded_file($file['tmp_name'], $dest)) {
     exit;
 }
 
-// Save submission log
-$log = __DIR__ . "/storage/homework_submissions.txt";
-$entry = $studentId . "|" . $studentName . "|" . $course . "|" . $assignment . "|" . $newName . "|" . date("Y-m-d H:i:s") . "\n";
+// Save submission log to database
+require_once __DIR__ . '/config/database.php';
 
-file_put_contents($log, $entry, FILE_APPEND);
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("INSERT INTO homework_submissions (student_id, student_name, course, assignment, filename, file_path, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$studentId, $studentName, $course, $assignment, $newName, $dest, date("Y-m-d H:i:s")]);
+} catch (PDOException $e) {
+    error_log("Homework submission save error: " . $e->getMessage());
+}
 
 header("Location: upload-homework.php?status=success");
 exit;

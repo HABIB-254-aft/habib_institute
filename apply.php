@@ -48,19 +48,16 @@ $body .= "Website Application Form\n";
 $headers  = "From: Habib Institute <info@habibinstitute.com>\r\n";
 $headers .= "Reply-To: $email\r\n";
 
-// ---- SAVE APPLICATION TO FILE ----
-$savePath = __DIR__ . "/storage/applications.txt";
+// ---- SAVE APPLICATION TO DATABASE ----
+require_once __DIR__ . '/config/database.php';
 
-$entry = "----- APPLICATION -----\n"
-       . "Name: $name\n"
-       . "Email: $email\n"
-       . "Phone: $phone\n"
-       . "Course: $course\n"
-       . "Message: $message\n"
-       . "Date: " . date("Y-m-d H:i:s") . "\n"
-       . "-------------------------\n\n";
-
-file_put_contents($savePath, $entry, FILE_APPEND);
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("INSERT INTO applications (name, email, phone, course, message, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$name, $email, $phone, $course, $message, date("Y-m-d H:i:s")]);
+} catch (PDOException $e) {
+    error_log("Application save error: " . $e->getMessage());
+}
 
 // 6. Send email
 $mailSent = false;
@@ -92,6 +89,8 @@ if ($mailSent) {
 <head>
     <meta charset="UTF-8">
     <title>Application Received – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 

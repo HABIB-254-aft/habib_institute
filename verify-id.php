@@ -2,35 +2,35 @@
 $result = null;
 $details = null;
 
+require_once __DIR__ . '/config/database.php';
+
 if (isset($_GET['student_id'])) {
     $inputId = trim($_GET['student_id']);
 
-    $filePath = __DIR__ . "/storage/student_ids.txt";
-    if (file_exists($filePath) && $inputId !== '') {
-        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-        foreach ($lines as $line) {
-            $parts = explode("|", $line);
-            if (count($parts) >= 7) {
-                list($id, $name, $course, $phone, $issue, $expiry, $savedAt) = $parts;
-                if (strcasecmp(trim($id), $inputId) === 0) {
-                    $result = "valid";
-                    $details = [
-                        "id" => $id,
-                        "name" => $name,
-                        "course" => $course,
-                        "phone" => $phone,
-                        "issue" => $issue,
-                        "expiry" => $expiry,
-                        "savedAt" => $savedAt
-                    ];
-                    break;
-                }
+    if ($inputId !== '') {
+        try {
+            $pdo = getDB();
+            $stmt = $pdo->prepare("SELECT student_id, name, course, phone, issue_date, expiry_date, created_at FROM student_ids WHERE student_id = ?");
+            $stmt->execute([$inputId]);
+            $idData = $stmt->fetch();
+            
+            if ($idData) {
+                $result = "valid";
+                $details = [
+                    "id" => $idData['student_id'],
+                    "name" => $idData['name'],
+                    "course" => $idData['course'],
+                    "phone" => $idData['phone'],
+                    "issue" => $idData['issue_date'],
+                    "expiry" => $idData['expiry_date'],
+                    "savedAt" => $idData['created_at']
+                ];
+            } else {
+                $result = "invalid";
             }
-        }
-
-        if ($result === null) {
+        } catch (PDOException $e) {
             $result = "invalid";
+            error_log("ID verification error: " . $e->getMessage());
         }
     } else {
         $result = "invalid";
@@ -42,7 +42,10 @@ if (isset($_GET['student_id'])) {
 <head>
     <meta charset="UTF-8">
     <title>Verify Student ID – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
+    <script src="./JS/script.js" defer></script>
 </head>
 <body>
 
@@ -63,7 +66,13 @@ if (isset($_GET['student_id'])) {
             <li><a href="students.html">STUDENT PORTAL</a></li>
         </ul>
     </nav>
-    <div class="menu-icon" id="menu-toggle">☰</div>
+    <div style="display: flex; align-items: center;">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+            <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+            <span id="theme-text">Dark</span>
+        </button>
+        <div class="menu-icon" id="menu-toggle">☰</div>
+    </div>
 </header>
 
 <div class="mobile-menu" id="mobile-menu">

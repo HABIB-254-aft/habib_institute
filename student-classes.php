@@ -8,24 +8,26 @@ if (!isset($_SESSION['student_logged_in'])) {
 
 $course = $_SESSION['student_course'];
 
-$storageDir = __DIR__ . "/storage/classes";
-$file = $storageDir . "/" . strtolower(str_replace(" ", "_", $course)) . ".txt";
+require_once __DIR__ . '/config/database.php';
 
 $classes = [];
-
-if (file_exists($file)) {
-    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-    foreach ($lines as $line) {
-        list($title, $zoom, $day, $time, $teacher) = explode("|", $line);
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT title, zoom_link, day, time, teacher FROM online_classes WHERE course = ?");
+    $stmt->execute([$course]);
+    $results = $stmt->fetchAll();
+    
+    foreach ($results as $row) {
         $classes[] = [
-            "title"  => $title,
-            "zoom"   => $zoom,
-            "day"    => $day,
-            "time"   => $time,
-            "teacher"=> $teacher
+            "title"  => $row['title'],
+            "zoom"   => $row['zoom_link'],
+            "day"    => $row['day'],
+            "time"   => $row['time'],
+            "teacher"=> $row['teacher']
         ];
     }
+} catch (PDOException $e) {
+    error_log("Classes load error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -33,6 +35,8 @@ if (file_exists($file)) {
 <head>
     <meta charset="UTF-8">
     <title>Online Classes – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

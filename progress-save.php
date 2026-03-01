@@ -13,20 +13,31 @@ $completed   = $_POST['completed_lessons'] ?? [];
 
 $completed = array_map('intval', $completed);
 
-$progressDir = __DIR__ . "/storage/progress";
-if (!is_dir($progressDir)) mkdir($progressDir, 0755, true);
+require_once __DIR__ . '/config/database.php';
 
-$progressFile = $progressDir . "/{$studentId}.txt";
-
-$lines = [];
-
-for ($i = 1; $i <= $lessonCount; $i++) {
-    $key = "lesson_{$i}";
-    $status = in_array($i, $completed) ? "done" : "pending";
-    $lines[] = $key . "=" . $status;
+try {
+    $pdo = getDB();
+    $pdo->beginTransaction();
+    
+    // Delete existing progress for this student
+    $stmt = $pdo->prepare("DELETE FROM student_progress WHERE student_id = ?");
+    $stmt->execute([$studentId]);
+    
+    // Insert new progress
+    $stmt = $pdo->prepare("INSERT INTO student_progress (student_id, lesson_key, status, updated_at) VALUES (?, ?, ?, ?)");
+    $updatedAt = date("Y-m-d H:i:s");
+    
+    for ($i = 1; $i <= $lessonCount; $i++) {
+        $key = "lesson_{$i}";
+        $status = in_array($i, $completed) ? "done" : "pending";
+        $stmt->execute([$studentId, $key, $status, $updatedAt]);
+    }
+    
+    $pdo->commit();
+} catch (PDOException $e) {
+    if (isset($pdo)) $pdo->rollBack();
+    error_log("Progress save error: " . $e->getMessage());
 }
-
-file_put_contents($progressFile, implode("\n", $lines) . "\n");
 
 header("Location: student-lessons.php?status=saved");
 exit;

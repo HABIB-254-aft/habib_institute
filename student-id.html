@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student ID Generator – Habib Institute</title>
-
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
     <script src="./JS/script.js" defer></script>
 
@@ -349,7 +350,13 @@
             </ul>
         </nav>
 
-        <div class="menu-icon" id="menu-toggle">☰</div>
+        <div style="display: flex; align-items: center;">
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+                <span id="theme-text">Dark</span>
+            </button>
+            <div class="menu-icon" id="menu-toggle">☰</div>
+        </div>
     </header>
 
     <!-- MOBILE MENU -->

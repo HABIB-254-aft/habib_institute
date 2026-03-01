@@ -7,35 +7,32 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// File location
-$appFile = __DIR__ . "/../storage/applications.txt";
+require_once __DIR__ . '/../config/database.php';
 
-// If file doesn't exist
-if (!file_exists($appFile)) {
-    $applications = "No applications found.";
-} else {
-    $applications = file_get_contents($appFile);
+$applications = [];
+try {
+    $pdo = getDB();
+    
+    // DELETE ALL HANDLER
+    if (isset($_POST['delete_all'])) {
+        $pdo->exec("DELETE FROM applications");
+    }
+    
+    $stmt = $pdo->query("SELECT * FROM applications ORDER BY created_at DESC");
+    $applications = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Applications view error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 
-<!-- DELETE ALL APPLICATIONS -->
-<form method="post" onsubmit="return confirm('Are you sure you want to delete ALL applications?');">
-    <input type="hidden" name="delete_all" value="1">
-    <button class="back-btn" style="background:red; margin-bottom:15px;">🗑 Delete All Applications</button>
-</form>
-
-// DELETE ALL HANDLER
-if (isset($_POST['delete_all'])) {
-    file_put_contents($appFile, ""); // empty the file
-    $applications = "";
-}
-
 
     <meta charset="UTF-8">
     <title>View Applications – Admin Panel</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
     <style>
         .admin-container {
@@ -77,12 +74,27 @@ if (isset($_POST['delete_all'])) {
 </section>
 
 <section class="admin-container fade-in">
+    <!-- DELETE ALL APPLICATIONS -->
+    <form method="post" onsubmit="return confirm('Are you sure you want to delete ALL applications?');">
+        <input type="hidden" name="delete_all" value="1">
+        <button class="back-btn" style="background:red; margin-bottom:15px;">🗑 Delete All Applications</button>
+    </form>
+
     <div class="admin-box">
         <?php 
-            if (trim($applications) === "") {
+            if (empty($applications)) {
                 echo "No applications available.";
             } else {
-                echo htmlspecialchars($applications);
+                foreach ($applications as $app) {
+                    echo "----- APPLICATION -----\n";
+                    echo "Name: " . htmlspecialchars($app['name']) . "\n";
+                    echo "Email: " . htmlspecialchars($app['email']) . "\n";
+                    echo "Phone: " . htmlspecialchars($app['phone']) . "\n";
+                    echo "Course: " . htmlspecialchars($app['course']) . "\n";
+                    echo "Message: " . htmlspecialchars($app['message']) . "\n";
+                    echo "Date: " . htmlspecialchars($app['created_at']) . "\n";
+                    echo "-------------------------\n\n";
+                }
             }
         ?>
     </div>

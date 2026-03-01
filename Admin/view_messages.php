@@ -7,31 +7,31 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// File location
-$msgFile = __DIR__ . "/../storage/messages.txt";
+require_once __DIR__ . '/../config/database.php';
 
-// If file doesn't exist
-if (!file_exists($msgFile)) {
-    $messages = "No messages found.";
-} else {
-    $messages = file_get_contents($msgFile);
+$messages = [];
+try {
+    $pdo = getDB();
+    
+    // DELETE ALL HANDLER
+    if (isset($_POST['delete_all'])) {
+        $pdo->exec("DELETE FROM messages");
+    }
+    
+    $stmt = $pdo->query("SELECT * FROM messages ORDER BY created_at DESC");
+    $messages = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Messages view error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <form method="post" onsubmit="return confirm('Delete ALL messages?');">
-    <input type="hidden" name="delete_all" value="1">
-    <button class="back-btn" style="background:red; margin-bottom:15px;">🗑 Delete All Messages</button>
-</form>
-
-if (isset($_POST['delete_all'])) {
-    file_put_contents($msgFile, "");
-    $messages = "";
-}
 
     <meta charset="UTF-8">
     <title>View Messages – Admin Panel</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
 
     <style>
@@ -77,12 +77,26 @@ if (isset($_POST['delete_all'])) {
 </section>
 
 <section class="admin-container fade-in">
+    <!-- DELETE ALL MESSAGES -->
+    <form method="post" onsubmit="return confirm('Delete ALL messages?');">
+        <input type="hidden" name="delete_all" value="1">
+        <button class="back-btn" style="background:red; margin-bottom:15px;">🗑 Delete All Messages</button>
+    </form>
+
     <div class="admin-box">
         <?php 
-            if (trim($messages) === "") {
+            if (empty($messages)) {
                 echo "No messages available.";
             } else {
-                echo htmlspecialchars($messages);
+                foreach ($messages as $msg) {
+                    echo "----- MESSAGE -----\n";
+                    echo "Name: " . htmlspecialchars($msg['name']) . "\n";
+                    echo "Email: " . htmlspecialchars($msg['email']) . "\n";
+                    echo "Phone: " . htmlspecialchars($msg['phone']) . "\n";
+                    echo "Message: " . htmlspecialchars($msg['message']) . "\n";
+                    echo "Date: " . htmlspecialchars($msg['created_at']) . "\n";
+                    echo "----------------------\n\n";
+                }
             }
         ?>
     </div>

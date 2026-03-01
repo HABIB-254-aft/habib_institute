@@ -27,18 +27,16 @@ if (!empty($errors)) {
     $errorMsg = implode(" ", $errors);
 }
 
-// ---- SAVE MESSAGE TO FILE ----
-$savePath = __DIR__ . "/storage/messages.txt";
+// ---- SAVE MESSAGE TO DATABASE ----
+require_once __DIR__ . '/config/database.php';
 
-$entry = "----- MESSAGE -----\n"
-       . "Name: $name\n"
-       . "Email: $email\n"
-       . "Phone: $phone\n"
-       . "Message: $message\n"
-       . "Date: " . date("Y-m-d H:i:s") . "\n"
-       . "----------------------\n\n";
-
-file_put_contents($savePath, $entry, FILE_APPEND);
+try {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("INSERT INTO messages (name, email, phone, message, created_at) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$name, $email, $phone, $message, date("Y-m-d H:i:s")]);
+} catch (PDOException $e) {
+    error_log("Message save error: " . $e->getMessage());
+}
 
 // 3. Email destination
 $to      = "info@habibinstitute.com";  // Your official email
@@ -85,6 +83,8 @@ if ($mailSent) {
 <head>
     <meta charset="UTF-8">
     <title>Message Received – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 

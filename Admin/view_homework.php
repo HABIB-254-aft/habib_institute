@@ -7,27 +7,15 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-$logFile = __DIR__ . "/../storage/homework_submissions.txt";
+require_once __DIR__ . '/../config/database.php';
+
 $submissions = [];
-
-if (file_exists($logFile)) {
-    $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-    // Newest first
-    $lines = array_reverse($lines);
-
-    foreach ($lines as $line) {
-        list($id, $name, $course, $assignment, $filename, $time) = explode("|", $line);
-
-        $submissions[] = [
-            "id"        => $id,
-            "name"      => $name,
-            "course"    => $course,
-            "assignment"=> $assignment,
-            "filename"  => $filename,
-            "time"      => $time
-        ];
-    }
+try {
+    $pdo = getDB();
+    $stmt = $pdo->query("SELECT * FROM homework_submissions ORDER BY created_at DESC");
+    $submissions = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Homework submissions view error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -35,6 +23,8 @@ if (file_exists($logFile)) {
 <head>
     <meta charset="UTF-8">
     <title>Homework Submissions – Admin Panel</title>
+    <link rel="icon" type="image/png" href="../IMG/my logo.png">
+    <link rel="apple-touch-icon" href="../IMG/my logo.png">
     <link rel="stylesheet" href="../CSS/style.css">
 
     <style>
@@ -105,12 +95,12 @@ if (file_exists($logFile)) {
             <div class="submission-card">
                 <h3><?= htmlspecialchars($s['assignment']) ?></h3>
 
-                <p><strong>Student:</strong> <?= htmlspecialchars($s['name']) ?> (<?= htmlspecialchars($s['id']) ?>)</p>
+                <p><strong>Student:</strong> <?= htmlspecialchars($s['student_name']) ?> (<?= htmlspecialchars($s['student_id']) ?>)</p>
                 <p><strong>Course:</strong> <?= htmlspecialchars($s['course']) ?></p>
-                <p><strong>Submitted:</strong> <?= htmlspecialchars($s['time']) ?></p>
+                <p><strong>Submitted:</strong> <?= htmlspecialchars($s['created_at']) ?></p>
 
                 <?php 
-                $filePath = "../storage/homework/" . $s['id'] . "/" . $s['filename']; 
+                $filePath = "../Storage/homework/" . $s['id'] . "/" . $s['filename']; 
                 ?>
 
                 <a class="download-btn" href="<?= $filePath ?>" download>📥 Download File</a>

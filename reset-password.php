@@ -1,7 +1,5 @@
 <?php
-$storageDir  = __DIR__ . "/storage";
-$resetsFile  = $storageDir . "/password_resets.txt";
-$studentsFile = $storageDir . "/students.txt";
+require_once __DIR__ . '/config/database.php';
 
 $token  = $_GET['token'] ?? '';
 $step   = 'request'; // request | form | done
@@ -9,26 +7,26 @@ $error  = '';
 $emailForToken = '';
 
 if ($token) {
-    // Look up token
-    if (file_exists($resetsFile)) {
-        $lines = file($resetsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            list($savedToken, $savedEmail, $savedExp) = explode("|", $line);
-            if (hash_equals($savedToken, $token)) {
-                if (time() <= (int)$savedExp) {
-                    $emailForToken = trim($savedEmail);
-                    $step = 'form';
-                } else {
-                    $error = "This reset link has expired.";
-                }
-                break;
+    // Look up token in database
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT email, expires_at FROM password_resets WHERE token = ?");
+        $stmt->execute([$token]);
+        $reset = $stmt->fetch();
+        
+        if ($reset) {
+            if (time() <= (int)$reset['expires_at']) {
+                $emailForToken = trim($reset['email']);
+                $step = 'form';
+            } else {
+                $error = "This reset link has expired.";
             }
-        }
-        if ($emailForToken === '' && $error === '') {
+        } else {
             $error = "Invalid or unknown reset link.";
         }
-    } else {
-        $error = "No reset requests found.";
+    } catch (PDOException $e) {
+        $error = "Error processing reset link.";
+        error_log("Password reset lookup error: " . $e->getMessage());
     }
 } else {
     $error = "Missing reset token.";
@@ -48,50 +46,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $step = 'form';
     } else {
         // Re-validate token and get email
-        $emailForToken = '';
-        $lines = file($resetsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        $remainingTokens = [];
-        foreach ($lines as $line) {
-            list($savedToken, $savedEmail, $savedExp) = explode("|", $line);
-            if (hash_equals($savedToken, $token) && time() <= (int)$savedExp) {
-                $emailForToken = trim($savedEmail);
-                // Do NOT keep this token (used)
-            } else {
-                $remainingTokens[] = $line;
-            }
-        }
-
-        if ($emailForToken === '') {
-            $error = "This reset link is invalid or expired.";
-            $step  = 'request';
-        } else {
-            // Update students.txt
-            if (file_exists($studentsFile)) {
-                $students = file($studentsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                $newStudents = [];
+        try {
+            $pdo = getDB();
+            $stmt = $pdo->prepare("SELECT email, expires_at FROM password_resets WHERE token = ?");
+            $stmt->execute([$token]);
+            $reset = $stmt->fetch();
+            
+            if ($reset && time() <= (int)$reset['expires_at']) {
+                $emailForToken = trim($reset['email']);
+                
+                // Update password in database
                 $hash = password_hash($pass1, PASSWORD_BCRYPT);
-
-                foreach ($students as $stuLine) {
-                    $parts = explode("|", $stuLine);
-                    if (count($parts) >= 7) {
-                        list($sid, $sname, $semail, $sphone, $scourse, $spass, $createdAt) = $parts;
-                        if (strcasecmp(trim($semail), $emailForToken) === 0) {
-                            // Replace password hash
-                            $stuLine = $sid . "|" . $sname . "|" . $semail . "|" . $sphone . "|" . $scourse . "|" . $hash . "|" . $createdAt;
-                        }
-                    }
-                    $newStudents[] = $stuLine;
-                }
-
-                file_put_contents($studentsFile, implode("\n", $newStudents) . "\n");
-                // Save remaining tokens (used one removed)
-                file_put_contents($resetsFile, implode("\n", $remainingTokens) . "\n");
-
+                $stmt = $pdo->prepare("UPDATE students SET password_hash = ? WHERE email = ?");
+                $stmt->execute([$hash, $emailForToken]);
+                
+                // Delete used token
+                $stmt = $pdo->prepare("DELETE FROM password_resets WHERE token = ?");
+                $stmt->execute([$token]);
+                
                 $step = 'done';
             } else {
-                $error = "No students file found.";
+                $error = "This reset link is invalid or expired.";
                 $step  = 'request';
             }
+        } catch (PDOException $e) {
+            $error = "Error updating password.";
+            error_log("Password reset update error: " . $e->getMessage());
+            $step = 'request';
         }
     }
 }
@@ -101,6 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Reset Password – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

@@ -1,11 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/config/database.php';
 
-// Ensure storage folder exists
-$storageDir = __DIR__ . "/storage";
-if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
-
-$filePath = $storageDir . "/students.txt";
 $message = "";
 $success = false;
 
@@ -22,29 +18,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $message = "Invalid email format.";
         } else {
-            // Check if email already exists
-            if (file_exists($filePath)) {
-                $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                foreach ($lines as $line) {
-                    list($id, $sname, $semail) = explode("|", $line);
-                    if (strcasecmp($semail, $email) === 0) {
-                        $message = "Email already registered.";
-                        break;
-                    }
+            try {
+                $pdo = getDB();
+                
+                // Check if email already exists
+                $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ?");
+                $stmt->execute([$email]);
+                if ($stmt->fetch()) {
+                    $message = "Email already registered.";
+                } else {
+                    // Register new student
+                    $hash = password_hash($password, PASSWORD_BCRYPT);
+                    $studentId = uniqid("STD");
+                    $createdAt = date("Y-m-d H:i:s");
+                    
+                    $stmt = $pdo->prepare("INSERT INTO students (id, name, email, phone, course, password_hash, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$studentId, $name, $email, $phone, $course, $hash, $createdAt]);
+                    
+                    $success = true;
+                    $message = "Registration successful! You can now log in.";
                 }
-            }
-
-            if ($message === "") {
-                $hash = password_hash($password, PASSWORD_BCRYPT);
-
-                $studentId = uniqid("STD");
-
-                $data = $studentId . "|" . $name . "|" . $email . "|" . $phone . "|" . $course . "|" . $hash . "|" . date("Y-m-d H:i:s") . "\n";
-
-                file_put_contents($filePath, $data, FILE_APPEND);
-
-                $success = true;
-                $message = "Registration successful! You can now log in.";
+            } catch (PDOException $e) {
+                $message = "Registration failed. Please try again.";
+                error_log("Registration error: " . $e->getMessage());
             }
         }
     }
@@ -55,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Student Registration – Habib Institute</title>
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>

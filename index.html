@@ -6,6 +6,8 @@
     <title>Habib Institute of Languages & Technology – Learn & Grow</title>
     <meta name="description" content="Habib Institute of Languages & Technology in Nairobi offers English, Somali, digital skills, coding, graphic design and exam preparation for students and professionals.">
     <meta name="keywords" content="Habib Institute, English classes, Somali language, digital literacy, coding bootcamp, Nairobi, Kenya">
+    <link rel="icon" type="image/png" href="./IMG/my logo.png">
+    <link rel="apple-touch-icon" href="./IMG/my logo.png">
     <link rel="stylesheet" href="./CSS/style.css">
     <script src="./JS/script.js" defer></script>
 </head>
@@ -32,7 +34,13 @@
             </ul>
         </nav>
 
-        <div class="menu-icon" id="menu-toggle">☰</div>
+        <div style="display: flex; align-items: center;">
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+                <span id="theme-text">Dark</span>
+            </button>
+            <div class="menu-icon" id="menu-toggle">☰</div>
+        </div>
     </header>
 
     <!-- MOBILE MENU -->
